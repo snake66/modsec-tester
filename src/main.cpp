@@ -23,6 +23,7 @@
 #include <modsecurity/modsecurity.h>
 #include <modsecurity/rules_set.h>
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <optional>
 
@@ -39,6 +40,11 @@ void logger(void *, const void * data)
 
 int main(int argc, char * argv[])
 {
+    if (argc < 2) {
+        std::cerr << "[-] No rules to load: Specify at least one rule file to load." << std::endl;
+        return EXIT_FAILURE;
+    }
+
     auto modsec = ModSecurity{};
     modsec.setServerLogCb(logger, LogProperty::TextLogProperty);
 
