@@ -17,16 +17,28 @@ using modsecurity::RulesSet;
 using modsecurity::Transaction;
 using modsecurity::ModSecurityIntervention;
 
-void process_start_line(Transaction & t, std::istream & input)
-{
-    std::string method;
-    std::string url;
-    std::string version;
+namespace {
+    void process_start_line(Transaction & t, std::istream & input)
+    {
+        std::string method;
+        std::string url;
+        std::string version;
 
-    input >> method >> url >> version;
-    std::cout << "[*] " << method << " " << url << " " << version << std::endl;
+        input >> method >> url >> version;
+        std::cout << "[*] " << method << " " << url << " " << version << std::endl;
 
-    t.processURI(url.c_str(), method.c_str(), version.c_str());
+        t.processURI(url.c_str(), method.c_str(), version.c_str());
+    }
+
+    void process_headers(Transaction & t, std::istream & input)
+    {
+        t.processRequestHeaders();
+    }
+
+    void process_body(Transaction & t, std::istream & input)
+    {
+        t.processRequestBody();
+    }
 }
 
 std::optional<ModSecurityIntervention> process(
@@ -48,12 +60,12 @@ std::optional<ModSecurityIntervention> process(
         return std::optional<ModSecurityIntervention>{intervention};
     }
 
-    modsecTransaction.processRequestHeaders();
+    process_headers(modsecTransaction, input);
     if (modsecTransaction.intervention(&intervention)) {
         return std::optional<ModSecurityIntervention>{intervention};
     }
 
-    modsecTransaction.processRequestBody();
+    process_body(modsecTransaction, input);
     if (modsecTransaction.intervention(&intervention)) {
         return std::optional<ModSecurityIntervention>{intervention};
     }
