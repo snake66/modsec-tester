@@ -14,3 +14,6 @@ modsec-tester: main.o process.o
 
 main.o: src/main.cpp src/process.hpp
 process.o: src/process.cpp src/process.hpp
+
+clean:
+	@rm *.o modsec-tester
