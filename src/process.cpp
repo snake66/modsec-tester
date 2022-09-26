@@ -24,10 +24,12 @@ namespace {
         std::string url;
         std::string version;
 
-        input >> method >> url >> version;
+        input >> method >> url >> version >> std::ws;
         std::cout << "[*] " << method << " " << url << " " << version << std::endl;
 
-        t.processURI(url.c_str(), method.c_str(), version.c_str());
+        auto version_pos = version.find_first_of('/');
+
+        t.processURI(url.c_str(), method.c_str(), version.c_str() + version_pos + 1);
     }
 
     void process_headers(Transaction & t, std::istream & input)
