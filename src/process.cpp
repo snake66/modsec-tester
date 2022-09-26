@@ -34,6 +34,20 @@ namespace {
 
     void process_headers(Transaction & t, std::istream & input)
     {
+        auto line = std::string{};
+
+        do {
+            std::getline(input, line);
+            if (!line.empty()) {
+                auto key_len = line.find_first_of(':');
+                auto value_start = line.find_first_not_of(": \t", key_len);
+                auto value_len = line.size() - value_start;
+                t.addRequestHeader(
+                        reinterpret_cast<const unsigned char *>(line.c_str()), key_len,
+                        reinterpret_cast<const unsigned char *>(line.c_str()) + value_start, value_len);
+            }
+        } while(!line.empty());
+
         t.processRequestHeaders();
     }
 
